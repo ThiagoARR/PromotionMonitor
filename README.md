@@ -1,6 +1,6 @@
 # PromotionMonitor
 
-Phase 1 MVP: register product watches (URL, voltage, max price), collect price history from mock / structured HTML sources, compute an auditable **pay-at-checkout** vs **net-after-cashback** breakdown, and deliver alerts on Console/Email channels with idempotency.
+Price monitoring with Phase 1 MVP + Phase 2 enrichments: register product watches, collect history, auditable **pay-at-checkout** vs **net-after-cashback**, coupons/cashback rules, CEP shipping quotes (simulated without credentials), multi-store comparison, and Console/Email alerts with idempotency.
 
 ## Stack
 
@@ -20,18 +20,19 @@ docker compose up --build
 - Health: http://localhost:45881/health
 - Hangfire: http://localhost:45881/hangfire
 
-Default SQL SA password is in `.env.example` (local only). SMTP left empty → email delivery is **clearly simulated**.
+Default SQL SA password is in `.env.example` (local only). SMTP / Shipping API left empty → **simulated** email and CEP freight.
 
 > Compose wires the API to SQL through `host.docker.internal` (published host port). That avoids environments where container-to-container traffic on `:1433` is filtered; on a normal Docker Desktop/Linux bridge you can switch the connection string host back to `sqlserver` if you prefer.
 
 ### Demo flow
 
 1. Open the web UI → **Create an account** → sign in.
-2. **New monitoring** with URL `https://example.com/products/demo-airfryer-110`, voltage `110V`, max price `450`, source **Mock catalog**, demo mode on.
-3. Open the detail page → **Check now** → inspect pay-at-checkout breakdown and chart.
-4. Alerts appear under **Alerts** (Console provider always; Email simulated without SMTP).
+2. **Rules** → add a confirmed coupon and a cashback %; probe CEP shipping.
+3. **New monitoring** with URL `https://example.com/products/demo-airfryer-110`, CEP `01310-100`, voltage `110V`, max price `450`, mock source, demo on.
+4. Detail → **Check now** → breakdown + store comparison; **Add store** with another mock URL (e.g. `demo-airfryer-220`) to compare.
+5. Alerts under **Alerts** (Console always; Email simulated without SMTP).
 
-Mock catalog keys (embed in URL or model): `demo-airfryer-110`, `demo-airfryer-220`, `demo-airfryer-bivolt`, `demo-notebook`, `demo-phone`. URLs containing `fail` simulate source failure (**no invented prices**).
+Mock catalog keys: `demo-airfryer-110`, `demo-airfryer-220`, `demo-airfryer-bivolt`, `demo-notebook`, `demo-phone`. URLs containing `fail` → source failure (**no invented prices**).
 
 ## Local development (without full compose)
 

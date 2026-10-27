@@ -13,4 +13,6 @@ public class UserAccount
 
     public ICollection<Monitoring> Monitorings { get; set; } = new List<Monitoring>();
     public ICollection<NotificationDelivery> Deliveries { get; set; } = new List<NotificationDelivery>();
+    public ICollection<CouponRule> CouponRules { get; set; } = new List<CouponRule>();
+    public ICollection<CashbackRule> CashbackRules { get; set; } = new List<CashbackRule>();
 }

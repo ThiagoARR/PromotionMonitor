@@ -29,7 +29,7 @@ export function Layout() {
               PromotionMonitor
             </span>
             <span className="hidden text-xs uppercase tracking-[0.18em] text-black/45 sm:inline">
-              Phase 1
+              Phase 2
             </span>
           </Link>
           <nav className="flex items-center gap-2 text-sm">
@@ -48,6 +48,14 @@ export function Layout() {
               }
             >
               New watch
+            </NavLink>
+            <NavLink
+              to="/rules"
+              className={({ isActive }) =>
+                `rounded-md px-3 py-1.5 ${isActive ? 'bg-black/5 font-medium' : 'text-black/60 hover:text-black'}`
+              }
+            >
+              Rules
             </NavLink>
             <span className="hidden text-black/50 md:inline">{user?.displayName ?? user?.email}</span>
             <Button variant="secondary" size="sm" onClick={logout}>

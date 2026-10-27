@@ -141,6 +141,7 @@ try
     app.MapHealthChecks("/health");
     app.MapAuthEndpoints();
     app.MapMonitoringEndpoints();
+    app.MapPhase2Endpoints();
     app.MapHangfireDashboard("/hangfire");
 
     var recurring = app.Services.GetRequiredService<IRecurringJobManager>();

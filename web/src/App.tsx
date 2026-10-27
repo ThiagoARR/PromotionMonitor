@@ -5,6 +5,7 @@ import { LoginPage } from '@/pages/LoginPage'
 import { MonitoringDetailPage } from '@/pages/MonitoringDetailPage'
 import { MonitoringFormPage } from '@/pages/MonitoringFormPage'
 import { RegisterPage } from '@/pages/RegisterPage'
+import { RulesPage } from '@/pages/RulesPage'
 
 function RequireAuth() {
   const token = localStorage.getItem('pm_token')
@@ -23,6 +24,7 @@ export default function App() {
             <Route path="/" element={<DashboardPage />} />
             <Route path="/monitorings/new" element={<MonitoringFormPage />} />
             <Route path="/monitorings/:id" element={<MonitoringDetailPage />} />
+            <Route path="/rules" element={<RulesPage />} />
           </Route>
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />

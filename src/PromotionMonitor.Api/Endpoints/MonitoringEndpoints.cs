@@ -117,6 +117,13 @@ public static class MonitoringEndpoints
                 DemoMode = request.DemoMode,
                 IsActive = true
             };
+            entity.StoreLinks.Add(new MonitoringStoreLink
+            {
+                Label = "Primary",
+                ProductUrl = entity.ProductUrl,
+                SourceKind = entity.SourceKind,
+                IsPrimary = true
+            });
             db.Monitorings.Add(entity);
             await db.SaveChangesAsync(ct);
 
@@ -160,7 +167,10 @@ public static class MonitoringEndpoints
                     o.Calculation is null ? null : new PriceCalculationDto(
                         o.Calculation.ListedPrice, o.Calculation.Shipping, o.Calculation.CouponDiscount,
                         o.Calculation.PayAtCheckout, o.Calculation.CashbackEstimate,
-                        o.Calculation.NetAfterCashback, o.Calculation.Notes))).ToList(),
+                        o.Calculation.NetAfterCashback, o.Calculation.Notes,
+                        o.Calculation.CouponCode, o.Calculation.CouponConfirmed,
+                        o.Calculation.ShippingProvider, o.Calculation.ShippingSimulated,
+                        o.Calculation.CashbackProgram))).ToList(),
                 alerts.Select(a => new NotificationDeliveryDto(
                     a.Id, a.Channel, a.Status.ToString(), a.Subject, a.Body,
                     a.CreatedAt, a.DeliveredAt,

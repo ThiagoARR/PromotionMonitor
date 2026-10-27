@@ -10,9 +10,10 @@ import {
   XAxis,
   YAxis,
 } from 'recharts'
-import { api, type MonitoringDetail } from '@/lib/api'
+import { api, type MonitoringDetail, type StoreOffer } from '@/lib/api'
 import { formatBrl } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 
 export function MonitoringDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -21,14 +22,18 @@ export function MonitoringDetailPage() {
   const [history, setHistory] = useState<
     { observedAt: string; listedPrice?: number | null; payAtCheckout?: number | null; netAfterCashback?: number | null }[]
   >([])
+  const [offers, setOffers] = useState<StoreOffer[]>([])
+  const [storeLabel, setStoreLabel] = useState('')
+  const [storeUrl, setStoreUrl] = useState('https://example.com/products/demo-airfryer-220')
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
 
   async function reload() {
     if (!id) return
-    const [d, h] = await Promise.all([api.getMonitoring(id), api.history(id, 30)])
+    const [d, h, c] = await Promise.all([api.getMonitoring(id), api.history(id, 30), api.comparison(id)])
     setDetail(d)
     setHistory(h)
+    setOffers(c)
   }
 
   useEffect(() => {
@@ -127,6 +132,104 @@ export function MonitoringDetailPage() {
           No successful offer yet. Use Check now, or wait for the schedule.
         </div>
       )}
+
+      <div className="rounded-2xl border border-black/5 bg-white/70 p-5">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <h2 className="text-2xl">Store comparison</h2>
+            <p className="mt-1 text-sm text-black/50">
+              Ranked by pay-at-checkout. Cashback never changes the checkout column.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Input
+              placeholder="Store label"
+              value={storeLabel}
+              onChange={(e) => setStoreLabel(e.target.value)}
+              className="w-36"
+            />
+            <Input
+              placeholder="Product URL"
+              value={storeUrl}
+              onChange={(e) => setStoreUrl(e.target.value)}
+              className="min-w-[220px] flex-1"
+            />
+            <Button
+              variant="secondary"
+              disabled={busy || !storeLabel}
+              onClick={async () => {
+                if (!id) return
+                setBusy(true)
+                try {
+                  await api.addStore(id, {
+                    label: storeLabel,
+                    productUrl: storeUrl,
+                    sourceKind: 0,
+                    isPrimary: false,
+                  })
+                  setStoreLabel('')
+                  await api.checkNow(id)
+                  await new Promise((r) => setTimeout(r, 1500))
+                  await reload()
+                } catch (err) {
+                  setError(err instanceof Error ? err.message : 'Failed to add store')
+                } finally {
+                  setBusy(false)
+                }
+              }}
+            >
+              Add store
+            </Button>
+          </div>
+        </div>
+        <div className="mt-4 overflow-x-auto">
+          {offers.length === 0 ? (
+            <p className="text-sm text-black/45">No comparison round yet — run Check now.</p>
+          ) : (
+            <table className="w-full text-left text-sm">
+              <thead className="border-b border-black/5 text-xs uppercase tracking-wider text-black/45">
+                <tr>
+                  <th className="px-2 py-2">Store</th>
+                  <th className="px-2 py-2">Listed</th>
+                  <th className="px-2 py-2">Shipping</th>
+                  <th className="px-2 py-2">Coupon</th>
+                  <th className="px-2 py-2">Checkout</th>
+                  <th className="px-2 py-2">Net after CB</th>
+                </tr>
+              </thead>
+              <tbody>
+                {offers.map((o) => (
+                  <tr
+                    key={o.id}
+                    className={`border-b border-black/5 last:border-0 ${o.isBestPayAtCheckout ? 'bg-emerald-50/70' : ''}`}
+                  >
+                    <td className="px-2 py-2">
+                      <div className="font-medium">{o.storeLabel}</div>
+                      <div className="text-xs text-black/45">{o.success ? o.productTitle : o.errorMessage}</div>
+                    </td>
+                    <td className="px-2 py-2 tabular-nums">{formatBrl(o.listedPrice)}</td>
+                    <td className="px-2 py-2 tabular-nums">
+                      {formatBrl(o.shipping)}
+                      {o.shippingSimulated ? <span className="text-xs text-black/40"> sim</span> : null}
+                    </td>
+                    <td className="px-2 py-2 tabular-nums">
+                      {o.couponCode ? `${o.couponCode} −${formatBrl(o.couponDiscount)}` : '—'}
+                    </td>
+                    <td className="px-2 py-2 tabular-nums font-medium">
+                      {formatBrl(o.payAtCheckout)}
+                      {o.isBestPayAtCheckout ? <span className="ml-1 text-xs text-emerald-700">best</span> : null}
+                    </td>
+                    <td className="px-2 py-2 tabular-nums">
+                      {formatBrl(o.netAfterCashback)}
+                      {o.isBestNetAfterCashback ? <span className="ml-1 text-xs text-[var(--color-amber)]">best net</span> : null}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
+      </div>
 
       <div className="rounded-2xl border border-black/5 bg-white/70 p-5">
         <h2 className="text-2xl">Price history (30 days)</h2>

@@ -9,6 +9,7 @@ using PromotionMonitor.Infrastructure.Auth;
 using PromotionMonitor.Infrastructure.Jobs;
 using PromotionMonitor.Infrastructure.Notifications;
 using PromotionMonitor.Infrastructure.Persistence;
+using PromotionMonitor.Infrastructure.Shipping;
 using PromotionMonitor.Infrastructure.Sources;
 
 namespace PromotionMonitor.Infrastructure;
@@ -22,6 +23,7 @@ public static class DependencyInjection
 
         services.Configure<JwtOptions>(configuration.GetSection(JwtOptions.SectionName));
         services.Configure<SmtpOptions>(configuration.GetSection(SmtpOptions.SectionName));
+        services.Configure<ShippingApiOptions>(configuration.GetSection(ShippingApiOptions.SectionName));
 
         services.AddDbContext<AppDbContext>(options =>
             options.UseSqlServer(connectionString));
@@ -32,13 +34,21 @@ public static class DependencyInjection
             client.Timeout = TimeSpan.FromSeconds(20);
             client.DefaultRequestHeaders.UserAgent.ParseAdd("PromotionMonitor/1.0 (+local-dev; respectful-fetcher)");
         });
+        services.AddHttpClient("ShippingApi", client =>
+        {
+            client.Timeout = TimeSpan.FromSeconds(15);
+            client.DefaultRequestHeaders.UserAgent.ParseAdd("PromotionMonitor/1.0 (+shipping)");
+        });
 
         services.AddSingleton<IJwtTokenService, JwtTokenService>();
         services.AddScoped<IPriceSource, MockCatalogSource>();
         services.AddScoped<IPriceSource, HtmlStructuredSource>();
         services.AddScoped<INotificationProvider, ConsoleNotificationProvider>();
         services.AddScoped<INotificationProvider, EmailNotificationProvider>();
-        // WhatsApp / WebPush intentionally not registered for delivery in Phase 1.
+        services.AddSingleton<SimulatedShippingProvider>();
+        services.AddScoped<HttpShippingProvider>();
+        services.AddScoped<IShippingQuoteProvider, CompositeShippingProvider>();
+        // WhatsApp / WebPush intentionally not registered for delivery (Phase 3).
 
         services.AddHangfire(config => config
             .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)

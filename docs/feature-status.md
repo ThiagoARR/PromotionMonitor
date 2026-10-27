@@ -1,9 +1,11 @@
-# Feature status — Phase 1 MVP
+# Feature status — PromotionMonitor
 
-See the durable copy in the agent store (`docs/feature-status.md`). Summary:
+See the durable copy in the agent store (`docs/feature-status.md`).
 
-**Implemented:** JWT auth, monitoring CRUD, Hangfire collector, Mock + HTML/JSON-LD sources (demo mode), price history, effective-cost calculator, Console/Email alerts with idempotency, dashboard/detail UI, SSRF checks, Swagger/health/logs, Compose, automated tests.
+**Phase 1:** JWT, monitoring CRUD, Hangfire, mock/HTML sources, history, effective cost, alerts, dashboard, SSRF, Compose, tests.
 
-**Pending:** advanced coupons/cashback, real CEP shipping, WhatsApp, Web Push/PWA, NLP, Redis/queues, extra retailers.
+**Phase 2:** Coupon rules, cashback rules, CEP shipping (simulated or HTTP), multi-store comparison + UI (`/rules`, comparison table).
 
-**Credential-dependent:** SMTP (simulated when empty); live HTML needs public structured markup; replace JWT key outside local demos.
+**Pending:** WhatsApp/Web Push/PWA, NLP, Redis, more live retailers.
+
+**Credential-dependent:** SMTP simulated when empty; Shipping HTTP falls back to `SimulatedCep`; live HTML needs public structured markup.

@@ -22,6 +22,103 @@ namespace PromotionMonitor.Infrastructure.Persistence.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("PromotionMonitor.Domain.Entities.CashbackRule", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("Kind")
+                        .HasColumnType("int");
+
+                    b.Property<decimal?>("MaxCashback")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<string>("Provider")
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("Value")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("CashbackRules");
+                });
+
+            modelBuilder.Entity("PromotionMonitor.Domain.Entities.CouponRule", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsConfirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("Kind")
+                        .HasColumnType("int");
+
+                    b.Property<decimal?>("MaxDiscount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal?>("MinSubtotal")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset?>("ValidFrom")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset?>("ValidUntil")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<decimal>("Value")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId", "Code");
+
+                    b.ToTable("CouponRules");
+                });
+
             modelBuilder.Entity("PromotionMonitor.Domain.Entities.Monitoring", b =>
                 {
                     b.Property<Guid>("Id")
@@ -86,6 +183,41 @@ namespace PromotionMonitor.Infrastructure.Persistence.Migrations
                     b.HasIndex("UserId", "IsActive");
 
                     b.ToTable("Monitorings");
+                });
+
+            modelBuilder.Entity("PromotionMonitor.Domain.Entities.MonitoringStoreLink", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<bool>("IsPrimary")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Label")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<Guid>("MonitoringId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ProductUrl")
+                        .IsRequired()
+                        .HasMaxLength(2048)
+                        .HasColumnType("nvarchar(2048)");
+
+                    b.Property<int>("SourceKind")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MonitoringId");
+
+                    b.ToTable("StoreLinks");
                 });
 
             modelBuilder.Entity("PromotionMonitor.Domain.Entities.NotificationDelivery", b =>
@@ -158,6 +290,17 @@ namespace PromotionMonitor.Infrastructure.Persistence.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<string>("CashbackProgram")
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<string>("CouponCode")
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<bool>("CouponConfirmed")
+                        .HasColumnType("bit");
+
                     b.Property<decimal>("CouponDiscount")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
@@ -185,6 +328,13 @@ namespace PromotionMonitor.Infrastructure.Persistence.Migrations
                     b.Property<decimal>("Shipping")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("ShippingProvider")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<bool>("ShippingSimulated")
+                        .HasColumnType("bit");
 
                     b.HasKey("Id");
 
@@ -271,6 +421,162 @@ namespace PromotionMonitor.Infrastructure.Persistence.Migrations
                     b.ToTable("Observations");
                 });
 
+            modelBuilder.Entity("PromotionMonitor.Domain.Entities.ShippingQuoteRecord", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Cep")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("nvarchar(16)");
+
+                    b.Property<string>("ErrorMessage")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("ListedPrice")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<Guid?>("MonitoringId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Provider")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<decimal?>("QuoteAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTimeOffset>("QuotedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("RawPayload")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("Simulated")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("Success")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Cep", "QuotedAt");
+
+                    b.ToTable("ShippingQuotes");
+                });
+
+            modelBuilder.Entity("PromotionMonitor.Domain.Entities.StoreOffer", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal?>("CashbackEstimate")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTimeOffset>("CollectedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid>("ComparisonRoundId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CouponCode")
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<bool>("CouponConfirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal?>("CouponDiscount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("ErrorMessage")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsBestNetAfterCashback")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsBestPayAtCheckout")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal?>("ListedPrice")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<Guid>("MonitoringId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal?>("NetAfterCashback")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal?>("PayAtCheckout")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("ProductTitle")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ProductUrl")
+                        .IsRequired()
+                        .HasMaxLength(2048)
+                        .HasColumnType("nvarchar(2048)");
+
+                    b.Property<string>("RawPayload")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal?>("Shipping")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("ShippingProvider")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<bool>("ShippingSimulated")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("SourceKind")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SourceName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("StoreLabel")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<Guid?>("StoreLinkId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("Success")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("VoltageDetected")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool?>("VoltageMatches")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MonitoringId", "ComparisonRoundId");
+
+                    b.ToTable("StoreOffers");
+                });
+
             modelBuilder.Entity("PromotionMonitor.Domain.Entities.UserAccount", b =>
                 {
                     b.Property<Guid>("Id")
@@ -313,6 +619,28 @@ namespace PromotionMonitor.Infrastructure.Persistence.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("PromotionMonitor.Domain.Entities.CashbackRule", b =>
+                {
+                    b.HasOne("PromotionMonitor.Domain.Entities.UserAccount", "User")
+                        .WithMany("CashbackRules")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("PromotionMonitor.Domain.Entities.CouponRule", b =>
+                {
+                    b.HasOne("PromotionMonitor.Domain.Entities.UserAccount", "User")
+                        .WithMany("CouponRules")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("PromotionMonitor.Domain.Entities.Monitoring", b =>
                 {
                     b.HasOne("PromotionMonitor.Domain.Entities.UserAccount", "User")
@@ -322,6 +650,17 @@ namespace PromotionMonitor.Infrastructure.Persistence.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("PromotionMonitor.Domain.Entities.MonitoringStoreLink", b =>
+                {
+                    b.HasOne("PromotionMonitor.Domain.Entities.Monitoring", "Monitoring")
+                        .WithMany("StoreLinks")
+                        .HasForeignKey("MonitoringId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Monitoring");
                 });
 
             modelBuilder.Entity("PromotionMonitor.Domain.Entities.NotificationDelivery", b =>
@@ -365,11 +704,26 @@ namespace PromotionMonitor.Infrastructure.Persistence.Migrations
                     b.Navigation("Monitoring");
                 });
 
+            modelBuilder.Entity("PromotionMonitor.Domain.Entities.StoreOffer", b =>
+                {
+                    b.HasOne("PromotionMonitor.Domain.Entities.Monitoring", "Monitoring")
+                        .WithMany("StoreOffers")
+                        .HasForeignKey("MonitoringId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Monitoring");
+                });
+
             modelBuilder.Entity("PromotionMonitor.Domain.Entities.Monitoring", b =>
                 {
                     b.Navigation("Deliveries");
 
                     b.Navigation("Observations");
+
+                    b.Navigation("StoreLinks");
+
+                    b.Navigation("StoreOffers");
                 });
 
             modelBuilder.Entity("PromotionMonitor.Domain.Entities.PriceObservation", b =>
@@ -379,6 +733,10 @@ namespace PromotionMonitor.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("PromotionMonitor.Domain.Entities.UserAccount", b =>
                 {
+                    b.Navigation("CashbackRules");
+
+                    b.Navigation("CouponRules");
+
                     b.Navigation("Deliveries");
 
                     b.Navigation("Monitorings");

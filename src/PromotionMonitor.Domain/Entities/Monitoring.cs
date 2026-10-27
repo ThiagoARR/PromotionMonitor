@@ -25,4 +25,6 @@ public class Monitoring
 
     public ICollection<PriceObservation> Observations { get; set; } = new List<PriceObservation>();
     public ICollection<NotificationDelivery> Deliveries { get; set; } = new List<NotificationDelivery>();
+    public ICollection<MonitoringStoreLink> StoreLinks { get; set; } = new List<MonitoringStoreLink>();
+    public ICollection<StoreOffer> StoreOffers { get; set; } = new List<StoreOffer>();
 }
