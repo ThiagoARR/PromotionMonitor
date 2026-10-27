@@ -1,0 +1,29 @@
+## .NET
+bin/
+obj/
+*.user
+*.suo
+.vs/
+*.DotSettings.user
+
+## Node
+web/node_modules/
+web/dist/
+
+## Env / secrets
+.env
+.env.local
+*.pfx
+
+## OS / IDE
+.DS_Store
+.idea/
+.vscode/
+
+## Test / coverage
+TestResults/
+coverage/
+
+## Logs
+*.log
+logs/

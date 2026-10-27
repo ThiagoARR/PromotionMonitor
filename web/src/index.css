@@ -1,0 +1,40 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "IBM Plex Sans", "Segoe UI", sans-serif;
+  --font-display: "Fraunces", Georgia, serif;
+  --color-ink: #14201b;
+  --color-moss: #1f6f4a;
+  --color-moss-deep: #134e34;
+  --color-fog: #e7f0ea;
+  --color-sand: #f3efe6;
+  --color-amber: #c47b2b;
+  --color-danger: #b42318;
+  --color-panel: #ffffffcc;
+}
+
+@layer base {
+  html,
+  body,
+  #root {
+    min-height: 100%;
+  }
+
+  body {
+    margin: 0;
+    font-family: var(--font-sans);
+    color: var(--color-ink);
+    background:
+      radial-gradient(circle at 12% 10%, #d9eadf 0%, transparent 42%),
+      radial-gradient(circle at 88% 0%, #f0e2c8 0%, transparent 35%),
+      linear-gradient(160deg, #f7f4ee 0%, #eaf3ee 48%, #e3ebe5 100%);
+    background-attachment: fixed;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+  }
+}
