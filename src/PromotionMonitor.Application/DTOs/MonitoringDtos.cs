@@ -50,7 +50,12 @@ public sealed record PriceCalculationDto(
     decimal PayAtCheckout,
     decimal CashbackEstimate,
     decimal NetAfterCashback,
-    string Notes);
+    string Notes,
+    string? CouponCode = null,
+    bool CouponConfirmed = false,
+    string? ShippingProvider = null,
+    bool ShippingSimulated = false,
+    string? CashbackProgram = null);
 
 public sealed record ObservationDto(
     Guid Id,

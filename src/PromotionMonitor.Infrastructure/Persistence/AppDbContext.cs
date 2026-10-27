@@ -15,6 +15,11 @@ public sealed class AppDbContext : DbContext, IAppDbContext
     public DbSet<PriceObservation> Observations => Set<PriceObservation>();
     public DbSet<PriceCalculation> Calculations => Set<PriceCalculation>();
     public DbSet<NotificationDelivery> Deliveries => Set<NotificationDelivery>();
+    public DbSet<CouponRule> CouponRules => Set<CouponRule>();
+    public DbSet<CashbackRule> CashbackRules => Set<CashbackRule>();
+    public DbSet<MonitoringStoreLink> StoreLinks => Set<MonitoringStoreLink>();
+    public DbSet<StoreOffer> StoreOffers => Set<StoreOffer>();
+    public DbSet<ShippingQuoteRecord> ShippingQuotes => Set<ShippingQuoteRecord>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -71,6 +76,9 @@ public sealed class AppDbContext : DbContext, IAppDbContext
             e.Property(x => x.CashbackEstimate).HasPrecision(18, 2);
             e.Property(x => x.NetAfterCashback).HasPrecision(18, 2);
             e.Property(x => x.Notes).HasMaxLength(1024);
+            e.Property(x => x.ShippingProvider).HasMaxLength(100);
+            e.Property(x => x.CouponCode).HasMaxLength(64);
+            e.Property(x => x.CashbackProgram).HasMaxLength(128);
         });
 
         modelBuilder.Entity<NotificationDelivery>(e =>
@@ -84,6 +92,70 @@ public sealed class AppDbContext : DbContext, IAppDbContext
                 .OnDelete(DeleteBehavior.Restrict);
             e.HasOne(x => x.Monitoring).WithMany(m => m.Deliveries).HasForeignKey(x => x.MonitoringId)
                 .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<CouponRule>(e =>
+        {
+            e.HasKey(x => x.Id);
+            e.HasIndex(x => new { x.UserId, x.Code });
+            e.Property(x => x.Code).HasMaxLength(64).IsRequired();
+            e.Property(x => x.Description).HasMaxLength(256);
+            e.Property(x => x.Value).HasPrecision(18, 2);
+            e.Property(x => x.MinSubtotal).HasPrecision(18, 2);
+            e.Property(x => x.MaxDiscount).HasPrecision(18, 2);
+            e.HasOne(x => x.User).WithMany(u => u.CouponRules).HasForeignKey(x => x.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<CashbackRule>(e =>
+        {
+            e.HasKey(x => x.Id);
+            e.HasIndex(x => x.UserId);
+            e.Property(x => x.Name).HasMaxLength(128).IsRequired();
+            e.Property(x => x.Provider).HasMaxLength(128);
+            e.Property(x => x.Value).HasPrecision(18, 2);
+            e.Property(x => x.MaxCashback).HasPrecision(18, 2);
+            e.HasOne(x => x.User).WithMany(u => u.CashbackRules).HasForeignKey(x => x.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<MonitoringStoreLink>(e =>
+        {
+            e.HasKey(x => x.Id);
+            e.HasIndex(x => x.MonitoringId);
+            e.Property(x => x.Label).HasMaxLength(100).IsRequired();
+            e.Property(x => x.ProductUrl).HasMaxLength(2048).IsRequired();
+            e.HasOne(x => x.Monitoring).WithMany(m => m.StoreLinks).HasForeignKey(x => x.MonitoringId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<StoreOffer>(e =>
+        {
+            e.HasKey(x => x.Id);
+            e.HasIndex(x => new { x.MonitoringId, x.ComparisonRoundId });
+            e.Property(x => x.StoreLabel).HasMaxLength(100);
+            e.Property(x => x.ProductUrl).HasMaxLength(2048);
+            e.Property(x => x.SourceName).HasMaxLength(100);
+            e.Property(x => x.ShippingProvider).HasMaxLength(100);
+            e.Property(x => x.CouponCode).HasMaxLength(64);
+            e.Property(x => x.ListedPrice).HasPrecision(18, 2);
+            e.Property(x => x.Shipping).HasPrecision(18, 2);
+            e.Property(x => x.CouponDiscount).HasPrecision(18, 2);
+            e.Property(x => x.CashbackEstimate).HasPrecision(18, 2);
+            e.Property(x => x.PayAtCheckout).HasPrecision(18, 2);
+            e.Property(x => x.NetAfterCashback).HasPrecision(18, 2);
+            e.HasOne(x => x.Monitoring).WithMany(m => m.StoreOffers).HasForeignKey(x => x.MonitoringId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<ShippingQuoteRecord>(e =>
+        {
+            e.HasKey(x => x.Id);
+            e.HasIndex(x => new { x.Cep, x.QuotedAt });
+            e.Property(x => x.Cep).HasMaxLength(16);
+            e.Property(x => x.Provider).HasMaxLength(100);
+            e.Property(x => x.ListedPrice).HasPrecision(18, 2);
+            e.Property(x => x.QuoteAmount).HasPrecision(18, 2);
         });
     }
 }

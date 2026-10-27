@@ -42,6 +42,8 @@ services:
       Smtp__Password: "${SMTP_PASSWORD:-}"
       Smtp__From: "${SMTP_FROM:-}"
       Smtp__EnableSsl: "${SMTP_ENABLE_SSL:-true}"
+      Shipping__ApiUrl: "${SHIPPING_API_URL:-}"
+      Shipping__ApiKey: "${SHIPPING_API_KEY:-}"
       Cors__Origins__0: "http://localhost:45173"
       Cors__Origins__1: "http://127.0.0.1:45173"
       Cors__Origins__2: "http://web"

@@ -6,6 +6,7 @@ using PromotionMonitor.Application.Services;
 using PromotionMonitor.Domain.Entities;
 using PromotionMonitor.Domain.Enums;
 using PromotionMonitor.Infrastructure.Persistence;
+using PromotionMonitor.Infrastructure.Shipping;
 using PromotionMonitor.Infrastructure.Sources;
 using PromotionMonitor.Infrastructure.Notifications;
 
@@ -67,6 +68,9 @@ public class MonitoringCollectorTests
             db,
             sources,
             new EffectiveCostCalculator(),
+            new CouponEvaluator(db),
+            new CashbackEvaluator(db),
+            new SimulatedShippingProvider(),
             alerts,
             NullLogger<MonitoringCollector>.Instance);
     }

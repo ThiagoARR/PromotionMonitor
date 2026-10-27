@@ -148,4 +148,75 @@ export const api = {
         netAfterCashback?: number | null
       }[]
     >(`/api/monitorings/${id}/history?days=${days}`),
+  comparison: (id: string) => request<StoreOffer[]>(`/api/monitorings/${id}/comparison`),
+  listStores: (id: string) => request<StoreLink[]>(`/api/monitorings/${id}/stores`),
+  addStore: (id: string, body: Record<string, unknown>) =>
+    request<{ id: string }>(`/api/monitorings/${id}/stores`, { method: 'POST', body: JSON.stringify(body) }),
+  listCoupons: () => request<CouponRule[]>(`/api/coupons`),
+  createCoupon: (body: Record<string, unknown>) =>
+    request<{ id: string }>('/api/coupons', { method: 'POST', body: JSON.stringify(body) }),
+  deleteCoupon: (id: string) => request<void>(`/api/coupons/${id}`, { method: 'DELETE' }),
+  listCashback: () => request<CashbackRule[]>(`/api/cashback-rules`),
+  createCashback: (body: Record<string, unknown>) =>
+    request<{ id: string }>('/api/cashback-rules', { method: 'POST', body: JSON.stringify(body) }),
+  deleteCashback: (id: string) => request<void>(`/api/cashback-rules/${id}`, { method: 'DELETE' }),
+  quoteShipping: (cep: string, listedPrice: number) =>
+    request<{ success: boolean; amount?: number | null; provider: string; simulated: boolean; errorMessage?: string | null }>(
+      '/api/shipping/quote',
+      { method: 'POST', body: JSON.stringify({ cep, listedPrice, weightKg: 1 }) },
+    ),
+}
+
+export type StoreOffer = {
+  id: string
+  comparisonRoundId: string
+  storeLabel: string
+  productUrl: string
+  sourceKind: number
+  collectedAt: string
+  success: boolean
+  errorMessage?: string | null
+  productTitle?: string | null
+  listedPrice?: number | null
+  shipping?: number | null
+  shippingProvider?: string | null
+  shippingSimulated: boolean
+  couponCode?: string | null
+  couponDiscount?: number | null
+  couponConfirmed: boolean
+  cashbackEstimate?: number | null
+  payAtCheckout?: number | null
+  netAfterCashback?: number | null
+  isBestPayAtCheckout: boolean
+  isBestNetAfterCashback: boolean
+}
+
+export type StoreLink = {
+  id: string
+  label: string
+  productUrl: string
+  sourceKind: number
+  isPrimary: boolean
+}
+
+export type CouponRule = {
+  id: string
+  code: string
+  description?: string | null
+  kind: number
+  value: number
+  minSubtotal?: number | null
+  maxDiscount?: number | null
+  isConfirmed: boolean
+  isActive: boolean
+}
+
+export type CashbackRule = {
+  id: string
+  name: string
+  provider?: string | null
+  kind: number
+  value: number
+  maxCashback?: number | null
+  isActive: boolean
 }

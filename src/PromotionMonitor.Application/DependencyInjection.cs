@@ -10,6 +10,8 @@ public static class DependencyInjection
     {
         services.AddSingleton<IEffectiveCostCalculator, EffectiveCostCalculator>();
         services.AddSingleton<IUrlSafetyValidator, UrlSafetyValidator>();
+        services.AddScoped<ICouponEvaluator, CouponEvaluator>();
+        services.AddScoped<ICashbackEvaluator, CashbackEvaluator>();
         services.AddScoped<IMonitoringCollector, MonitoringCollector>();
         services.AddScoped<IAlertDispatcher, AlertDispatcher>();
         return services;
