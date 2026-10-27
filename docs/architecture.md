@@ -66,6 +66,8 @@ Browser → web:45173 (nginx) → api:45881 → SQL Server
                               ↘ Hangfire workers (in-process)
 ```
 
+Compose currently routes API→SQL and web→API through `host.docker.internal` (published host ports) so the stack still runs on hosts where Docker bridge filtering blocks container-to-container traffic to service ports. On a normal Desktop/Linux bridge you can point those hosts back at the Compose service names (`sqlserver`, `api`).
+
 ### Extension points (later phases)
 
 - New `IPriceSource` implementations per retailer/feed
