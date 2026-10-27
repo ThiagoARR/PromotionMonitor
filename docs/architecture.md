@@ -55,9 +55,20 @@ Cashback **never** reduces checkout. Unconfirmed coupons are ignored. Values are
 4. Success → calculation persisted; if voltage matches (or unknown≠false) and `PayAtCheckout ≤ MaxPrice`, alerts dispatch.
 5. Fingerprint + delivery idempotency key suppress duplicate spam.
 
+### Phase 2 enrichment
+
+| Piece | Role |
+|-------|------|
+| `CouponRule` + `ICouponEvaluator` | Best applicable coupon; only **confirmed** reduces checkout |
+| `CashbackRule` + `ICashbackEvaluator` | Best program estimate; never reduces `PayAtCheckout` |
+| `IShippingQuoteProvider` | CEP quotes — `SimulatedCep` or live HTTP when configured |
+| `MonitoringStoreLink` / `StoreOffer` | Multi-store fetch per round; rank by checkout / net-after-cashback |
+
+Collector flow: for each store link → fetch price → quote shipping by CEP → evaluate coupon/cashback → persist `StoreOffer` + primary `PriceObservation`.
+
 ### Frontend
 
-SPA talks to `/api/*` (Vite proxy locally; nginx proxy in Compose). Screens: auth, dashboard, create watch, detail (breakdown + Recharts history + alerts).
+SPA talks to `/api/*` (Vite proxy locally; nginx proxy in Compose). Screens: auth, dashboard, create watch, detail (breakdown, comparison table, Recharts), **Rules** (coupons/cashback/shipping probe).
 
 ### Runtime topology
 
@@ -71,7 +82,6 @@ Compose currently routes API→SQL and web→API through `host.docker.internal` 
 ### Extension points (later phases)
 
 - New `IPriceSource` implementations per retailer/feed
-- Shipping calculators keyed by CEP
-- Coupon/cashback enrichers feeding `CostInputs`
 - WhatsApp / Web Push `INotificationProvider`s
+- NLP / smart matching
 - Additional monitoring kinds (availability, bundle deals) as strategy or subtype
